@@ -14,8 +14,8 @@ import random
 # ---------------- CONFIGURATION ----------------
 ZONE = pytz.timezone("Asia/Kolkata")
 CHECK_INTERVAL = (55, 65)  # Random delay range in seconds
-TEST_MODE = True  # ✅ Set True for after-hours testing
-RUN_ON_WEEKENDS = True  # ✅ Allow weekend execution if True
+TEST_MODE = False  # ✅ Set True for after-hours testing
+RUN_ON_WEEKENDS = False  # ✅ Allow weekend execution if True
 
 # Logging setup
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
