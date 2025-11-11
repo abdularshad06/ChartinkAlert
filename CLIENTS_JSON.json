@@ -1,0 +1,16 @@
+{
+  "client1": {
+    "BOT_TOKEN": "123456:ABCDEF",
+    "CHAT_ID": "111111111",
+    "EXPIRY": "2025-12-31",
+    "SCANNER_URL": "https://chartink.com/screener/my-scan-1",
+    "PAYLOAD": "( {cash} ( ( {33489} ... ) ) )"
+  },
+  "client2": {
+    "BOT_TOKEN": "987654:XYZABC",
+    "CHAT_ID": "222222222",
+    "EXPIRY": "2025-11-30",
+    "SCANNER_URL": "https://chartink.com/screener/my-scan-2",
+    "PAYLOAD": "( {cash} ( ( {12345} ... ) ) )"
+  }
+}
