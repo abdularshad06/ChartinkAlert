@@ -34,7 +34,7 @@ Shellgit initgit add .git commit -m "Initial commit"git branch -M maingit remote
 
 ✅ Step 3: Create Render Account
 
-Go to Render.com.
+Go to Render.com. --> https://render.com/
 Sign up using GitHub for easy repo connection.
 
 
