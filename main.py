@@ -27,6 +27,9 @@ CLIENTS = json.loads(os.getenv("CLIENTS_JSON", "{}"))
 HOLIDAYS = json.loads(os.getenv("HOLIDAYS_JSON", "[]"))
 HOLIDAYS = [date.fromisoformat(d) for d in HOLIDAYS]
 
+# ✅ Maintain previously sent stocks
+sent_stocks = {client_name: set() for client_name in CLIENTS.keys() if client_name != "_NOTE"}
+
 # ---------------- FUNCTIONS ----------------
 def is_market_hours():
     now = dt.now(tz=ZONE).time()
@@ -108,7 +111,10 @@ async def main():
             logging.info("Weekend detected and RUN_ON_WEEKENDS=False. Skipping execution.")
         elif is_market_hours() or TEST_MODE:
             for client_name, client_data in CLIENTS.items():
-                expiry_date = date.fromisoformat(client_data["EXPIRY"])
+                if client_name == "_NOTE" or not isinstance(client_data, dict):
+                    continue
+
+                expiry_date = date.fromisoformat(client_data.get("EXPIRY", "1900-01-01"))
                 if today > expiry_date:
                     logging.warning(f"Client {client_name} subscription expired.")
                     continue
@@ -116,12 +122,23 @@ async def main():
                 bot = Bot(token=client_data["BOT_TOKEN"])
                 chat_id = client_data["CHAT_ID"]
                 scanner_url = client_data["SCANNER_URL"]
-                payload = client_data["PAYLOAD"]
+                payload = client_data["PAYLOAD"].replace("&gt;", ">")
 
                 stocks = get_stocks(scanner_url, payload)
                 if not stocks.empty and "nsecode" in stocks.columns:
-                    for stock in stocks["nsecode"].tolist():
-                        await send_to_telegram(bot, chat_id, stock)
+                    all_stocks = stocks["nsecode"].tolist()
+                    new_stocks = [s for s in all_stocks if s not in sent_stocks[client_name]]
+                    old_stocks = set(all_stocks) - set(new_stocks)
+
+                    if old_stocks:
+                        logging.info(f"Already sent stocks for {client_name}: {old_stocks}")
+
+                    if new_stocks:
+                        for stock in new_stocks:
+                            await send_to_telegram(bot, chat_id, stock)
+                        sent_stocks[client_name].update(new_stocks)
+                    else:
+                        logging.info(f"No new stocks for {client_name}.")
                 else:
                     logging.info(f"No valid stock data found for client {client_name}.")
         else:
